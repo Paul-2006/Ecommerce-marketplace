@@ -1,0 +1,193 @@
+﻿using Ecommerce.Data;
+using Ecommerce.DTOs;
+using Ecommerce.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+
+namespace Ecommerce.Controllers
+{
+
+[Route("api/[controller]")]
+[ApiController]
+
+public class AdminProductController : ControllerBase
+{
+
+    private readonly ApplicationDbContext _context;
+
+
+
+    public AdminProductController(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+
+
+
+
+
+
+    // GET: api/AdminProduct/Pending
+
+    [HttpGet("Pending")]
+
+    public async Task<IActionResult> GetPendingProducts()
+    {
+
+
+        var products =
+            await _context.Products
+
+            .Where(p =>
+                p.ApprovalStatus == "Pending"
+            )
+
+            .ToListAsync();
+
+
+
+        return Ok(products);
+
+
+    }
+
+
+
+
+
+
+
+
+
+    // PUT: api/AdminProduct/Approve
+
+    [HttpPut("Approve")]
+
+    public async Task<IActionResult> ApproveProduct(
+        ProductApprovalDTO dto)
+    {
+
+
+
+        var product =
+            await _context.Products
+
+            .FindAsync(dto.ProductId);
+
+
+
+        if(product == null)
+        {
+            return NotFound(
+                "Product not found"
+            );
+        }
+
+
+
+
+
+
+
+        product.ApprovalStatus =
+            dto.ApprovalStatus;
+
+
+
+
+        var approval =
+            new Productapproval
+            {
+
+                ProductId =
+                    dto.ProductId,
+
+
+                Status =
+                    dto.ApprovalStatus,
+
+
+                Remarks =
+                    dto.Remarks,
+
+
+                ApprovedDate =
+                    DateTime.Now
+
+            };
+
+
+
+
+
+        _context.Productapprovals
+            .Add(approval);
+
+
+
+
+        await _context.SaveChangesAsync();
+
+
+
+
+        return Ok(new
+        {
+
+            message =
+            "Product approval updated",
+
+
+            status =
+            dto.ApprovalStatus
+
+        });
+
+
+    }
+
+
+
+
+
+
+
+
+
+    // GET: api/AdminProduct/History/1
+
+    [HttpGet("History/{productId}")]
+
+    public async Task<IActionResult> GetApprovalHistory(
+        int productId)
+    {
+
+
+
+        var history =
+            await _context.Productapprovals
+
+            .Where(p =>
+                p.ProductId == productId
+            )
+
+            .OrderByDescending(p =>
+                p.ApprovedDate
+            )
+
+            .ToListAsync();
+
+
+
+        return Ok(history);
+
+
+    }
+
+
+
+}
+
+}
