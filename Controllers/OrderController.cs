@@ -94,7 +94,7 @@ namespace Ecommerce.Controllers
 
 
                     decimal price =
-                        sellerProduct.Price ?? 0;
+                        sellerProduct.Price;
 
 
 

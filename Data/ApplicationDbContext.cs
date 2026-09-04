@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Ecommerce.Models;
 using Microsoft.EntityFrameworkCore;
@@ -129,6 +129,54 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder
             .UseCollation("utf8mb4_0900_ai_ci")
             .HasCharSet("utf8mb4");
+
+        modelBuilder.Entity<Adminaction>(e => e.HasKey(x => x.ActionId));
+        modelBuilder.Entity<Cart>(e => e.HasKey(x => x.CartId));
+        modelBuilder.Entity<Cartitem>(e => e.HasKey(x => x.CartItemId));
+        modelBuilder.Entity<Category>(e => e.HasKey(x => x.CategoryId));
+        modelBuilder.Entity<Customer>(e => e.HasKey(x => x.CustomerId));
+        modelBuilder.Entity<Customeraddress>(e => e.HasKey(x => x.AddressId));
+        modelBuilder.Entity<Customerfeedback>(e => e.HasKey(x => x.FeedbackId));
+        modelBuilder.Entity<Customerwallet>(e => e.HasKey(x => x.WalletId));
+        modelBuilder.Entity<Warehouseinventory>(e => e.HasKey(x => x.WarehouseInventoryId));
+        modelBuilder.Entity<Deliveryassignment>(e => e.HasKey(x => x.DeliveryAssignmentId));
+        modelBuilder.Entity<Deliveryinstruction>(e => e.HasKey(x => x.InstructionId));
+        modelBuilder.Entity<Deliverylocationtracking>(e => e.HasKey(x => x.LocationId));
+        modelBuilder.Entity<Deliveryotp>(e => e.HasKey(x => x.Otpid));
+        modelBuilder.Entity<Deliverypartner>(e => e.HasKey(x => x.DeliveryPartnerId));
+        modelBuilder.Entity<Deliverypartnerzone>(e => e.HasKey(x => x.Id));
+        modelBuilder.Entity<Deliveryzone>(e => e.HasKey(x => x.ZoneId));
+        modelBuilder.Entity<Faileddelivery>(e => e.HasKey(x => x.FailedDeliveryId));
+        modelBuilder.Entity<Notification>(e => e.HasKey(x => x.NotificationId));
+        modelBuilder.Entity<Order>(e => e.HasKey(x => x.OrderId));
+        modelBuilder.Entity<Orderitem>(e => e.HasKey(x => x.OrderItemId));
+        modelBuilder.Entity<Orderstatushistory>(e => e.HasKey(x => x.HistoryId));
+        modelBuilder.Entity<Payment>(e => e.HasKey(x => x.PaymentId));
+        modelBuilder.Entity<Pricedropnotification>(e => e.HasKey(x => x.PriceDropId));
+        modelBuilder.Entity<Product>(e => e.HasKey(x => x.ProductId));
+        modelBuilder.Entity<Productapproval>(e => e.HasKey(x => x.ApprovalId));
+        modelBuilder.Entity<Productcomparison>(e => e.HasKey(x => x.ComparisonId));
+        modelBuilder.Entity<Productimage>(e => e.HasKey(x => x.ImageId));
+        modelBuilder.Entity<Productrecommendation>(e => e.HasKey(x => x.RecommendationId));
+        modelBuilder.Entity<Productreview>(e => e.HasKey(x => x.ReviewId));
+        modelBuilder.Entity<Productspecification>(e => e.HasKey(x => x.SpecificationId));
+        modelBuilder.Entity<Role>(e => e.HasKey(x => x.RoleId));
+        modelBuilder.Entity<Searchhistory>(e => e.HasKey(x => x.SearchId));
+        modelBuilder.Entity<Seller>(e => e.HasKey(x => x.SellerId));
+        modelBuilder.Entity<Sellerorder>(e => e.HasKey(x => x.SellerOrderId));
+        modelBuilder.Entity<Sellerperformance>(e => e.HasKey(x => x.PerformanceId));
+        modelBuilder.Entity<Sellerproduct>(e => e.HasKey(x => x.SellerProductId));
+        modelBuilder.Entity<Sellerstatushistory>(e => e.HasKey(x => x.HistoryId));
+        modelBuilder.Entity<Sellerwarning>(e => e.HasKey(x => x.WarningId));
+        modelBuilder.Entity<Spinhistory>(e => e.HasKey(x => x.SpinId));
+        modelBuilder.Entity<Spinreward>(e => e.HasKey(x => x.RewardId));
+        modelBuilder.Entity<User>(e => e.HasKey(x => x.UserId));
+        modelBuilder.Entity<Warehouse>(e => e.HasKey(x => x.WarehouseId));
+        modelBuilder.Entity<Warehousemanager>(e => e.HasKey(x => x.WarehouseManagerId));
+        modelBuilder.Entity<Warehousenotification>(e => e.HasKey(x => x.NotificationId));
+        modelBuilder.Entity<Wishlist>(e => e.HasKey(x => x.WishlistId));
+        modelBuilder.Entity<Wishlistitem>(e => e.HasKey(x => x.WishlistItemId));
+
         // CART ITEM
 
         modelBuilder.Entity<Cartitem>(entity =>

@@ -47,6 +47,10 @@ namespace Ecommerce.Controllers
 
                 Pincode = dto.Pincode,
 
+                Latitude = dto.Latitude,
+
+                Longitude = dto.Longitude,
+
                 IsDefault = dto.IsDefault
 
             };
@@ -150,6 +154,10 @@ namespace Ecommerce.Controllers
             address.State = dto.State;
 
             address.Pincode = dto.Pincode;
+
+            address.Latitude = dto.Latitude;
+
+            address.Longitude = dto.Longitude;
 
             address.IsDefault = dto.IsDefault;
 

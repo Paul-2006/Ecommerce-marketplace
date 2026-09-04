@@ -1,8 +1,0 @@
-F:\Project\Ecommerce\obj\Debug\net9.0\Ecommerce.csproj.AssemblyReference.cache
-F:\Project\Ecommerce\obj\Debug\net9.0\rpswa.dswa.cache.json
-F:\Project\Ecommerce\obj\Debug\net9.0\Ecommerce.GeneratedMSBuildEditorConfig.editorconfig
-F:\Project\Ecommerce\obj\Debug\net9.0\Ecommerce.AssemblyInfoInputs.cache
-F:\Project\Ecommerce\obj\Debug\net9.0\Ecommerce.AssemblyInfo.cs
-F:\Project\Ecommerce\obj\Debug\net9.0\Ecommerce.csproj.CoreCompileInputs.cache
-F:\Project\Ecommerce\obj\Debug\net9.0\Ecommerce.MvcApplicationPartsAssemblyInfo.cs
-F:\Project\Ecommerce\obj\Debug\net9.0\Ecommerce.MvcApplicationPartsAssemblyInfo.cache

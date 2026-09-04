@@ -131,6 +131,16 @@ namespace Ecommerce.Controllers
 
                 approvalStatus = p.ApprovalStatus,
 
+                price = p.Sellerproducts
+            .OrderBy(sp => sp.Price)
+            .Select(sp => (decimal?)sp.Price)
+            .FirstOrDefault(),
+
+                stock = p.Sellerproducts
+            .OrderBy(sp => sp.Price)
+            .Select(sp => sp.StockQuantity)
+            .FirstOrDefault(),
+
 
 
                 image = p.Productimages

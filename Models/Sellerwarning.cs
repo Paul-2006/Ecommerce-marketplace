@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 
 namespace Ecommerce.Models;
 
@@ -9,15 +8,15 @@ public partial class Sellerwarning
 
     public int SellerId { get; set; }
 
-    public int FeedbackId { get; set; }
+    public int? FeedbackId { get; set; }
 
     public string? WarningReason { get; set; }
 
-    public string? WarningLevel { get; set; }
+    public DateTime? WarningDate { get; set; }
 
-    public DateTime? IssuedDate { get; set; }
+    public string? Status { get; set; }
 
-    public virtual Customerfeedback Feedback { get; set; } = null!;
+    public virtual Customerfeedback? Feedback { get; set; }
 
     public virtual Seller Seller { get; set; } = null!;
 }

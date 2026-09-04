@@ -18,7 +18,7 @@ namespace Ecommerce.Controllers
             _context = context;
         }
 
-
+        
 
         // Approve / Reject Product
         // POST: api/Admin/ProductApproval
@@ -154,6 +154,49 @@ namespace Ecommerce.Controllers
 
 
             return Ok(actions);
+        }
+
+        // GET: api/Admin/Users
+        [HttpGet("Users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = await _context.Users
+                .Include(u => u.Role)
+                .Select(u => new
+                {
+                    userId = u.UserId,
+                    username = u.Username,
+                    email = u.Email,
+                    phoneNumber = u.PhoneNumber,
+                    role = u.Role.RoleName,
+                    status = u.AccountStatus,
+                    createdDate = u.CreatedDate
+                })
+                .ToListAsync();
+
+            return Ok(users);
+        }
+
+        // GET: api/Admin/Sellers
+        [HttpGet("Sellers")]
+        public async Task<IActionResult> GetSellers()
+        {
+            var sellers = await _context.Sellers
+                .Include(s => s.User)
+                .Select(s => new
+                {
+                    sellerId = s.SellerId,
+                    businessName = s.BusinessName,
+                    email = s.User.Email,
+                    phoneNumber = s.User.PhoneNumber,
+                    approvalStatus = s.ApprovalStatus,
+                    status = s.Status,
+                    complaintCount = s.ComplaintCount,
+                    createdDate = s.CreatedDate
+                })
+                .ToListAsync();
+
+            return Ok(sellers);
         }
     }
 }

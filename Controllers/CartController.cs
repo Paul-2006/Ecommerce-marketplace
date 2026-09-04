@@ -34,15 +34,19 @@ namespace Ecommerce.Controllers
             }
 
 
-            // Check Product exists
+            // A cart item is tied to a specific seller's listing
+            // (Sellerproduct), not just the Product itself, so we
+            // resolve the cheapest active listing for this ProductId.
 
-            var productExists = await _context.Products
-                .AnyAsync(p => p.ProductId == dto.ProductId);
+            var sellerProduct = await _context.Sellerproducts
+                .Where(sp => sp.ProductId == dto.ProductId)
+                .OrderBy(sp => sp.Price)
+                .FirstOrDefaultAsync();
 
 
-            if (!productExists)
+            if (sellerProduct == null)
             {
-                return BadRequest("Product does not exist");
+                return BadRequest("Product is not available for purchase");
             }
 
 
@@ -52,7 +56,7 @@ namespace Ecommerce.Controllers
             var existingItem = await _context.Cartitems
                 .FirstOrDefaultAsync(c =>
                     c.CartId == dto.CartId &&
-                    c.ProductId == dto.ProductId);
+                    c.SellerProductId == sellerProduct.SellerProductId);
 
 
 
@@ -78,6 +82,7 @@ namespace Ecommerce.Controllers
             {
                 CartId = dto.CartId,
                 ProductId = dto.ProductId,
+                SellerProductId = sellerProduct.SellerProductId,
                 Quantity = dto.Quantity
             };
 
@@ -107,16 +112,18 @@ namespace Ecommerce.Controllers
             var items = await _context.Cartitems
                 .Where(c => c.CartId == cartId)
                 .Include(c => c.SellerProduct)
-.ThenInclude(sp => sp.Product)
+                .ThenInclude(sp => sp.Product)
                 .Select(c => new
                 {
                     c.CartItemId,
                     c.ProductId,
                     c.Quantity,
 
-                    ProductName = c.Product.ProductName,
+                    ProductName = c.SellerProduct.Product.ProductName,
 
-                    Description = c.Product.Description
+                    Description = c.SellerProduct.Product.Description,
+
+                    Price = c.SellerProduct.Price
                 })
                 .ToListAsync();
 
