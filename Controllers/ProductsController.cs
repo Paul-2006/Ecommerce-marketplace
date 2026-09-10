@@ -1,4 +1,4 @@
-﻿using Ecommerce.Data;
+using Ecommerce.Data;
 using Ecommerce.DTOs;
 using Ecommerce.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -9,77 +9,60 @@ namespace Ecommerce.Controllers
 {
 
     [Route("api/[controller]")]
+    [Route("api/Product")]
     [ApiController]
-
-    public class ProductController : ControllerBase
+    public class ProductsController : ControllerBase
     {
-
-
         private readonly ApplicationDbContext _context;
 
-
-
-        public ProductController(ApplicationDbContext context)
+        public ProductsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-
-
-
-
         // GET: api/Product
-
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
+            var sellerProducts = await _context.Sellerproducts
+                .Include(sp => sp.Product)
+                .ThenInclude(p => p.Productimages)
+                .Select(sp => new
+                {
+                    sellerProductId = sp.SellerProductId,
+                    productId = sp.Product.ProductId,
+                    productName = sp.Product.ProductName,
+                    description = sp.Product.Description,
+                    brand = sp.Product.Brand,
+                    warranty = sp.Product.Warranty,
+                    price = sp.Price,
+                    stock = sp.StockQuantity,
+                    image = sp.Product.Productimages.Select(i => i.ImageUrl).FirstOrDefault()
+                })
+                .ToListAsync();
 
-            var products = await _context.Sellerproducts
-
-            .Include(sp => sp.Product)
-
-            .ThenInclude(p => p.Productimages)
-
-            .Select(sp => new
+            if (sellerProducts.Count > 0)
             {
+                return Ok(sellerProducts);
+            }
 
-                sellerProductId = sp.SellerProductId,
+            var directProducts = await _context.Products
+                .Include(p => p.Productimages)
+                .Select(p => new
+                {
+                    sellerProductId = p.ProductId,
+                    productId = p.ProductId,
+                    productName = p.ProductName,
+                    description = p.Description,
+                    brand = p.Brand,
+                    warranty = p.Warranty,
+                    price = 9999m,
+                    stock = 10,
+                    image = p.Productimages.Select(i => i.ImageUrl).FirstOrDefault()
+                })
+                .ToListAsync();
 
-
-                productId = sp.Product.ProductId,
-
-
-                productName = sp.Product.ProductName,
-
-
-                description = sp.Product.Description,
-
-
-                brand = sp.Product.Brand,
-
-
-                warranty = sp.Product.Warranty,
-
-
-                price = sp.Price,
-
-
-                stock = sp.StockQuantity,
-
-
-                image = sp.Product.Productimages
-            .Select(i => i.ImageUrl)
-            .FirstOrDefault()
-
-
-            })
-
-            .ToListAsync();
-
-
-
-            return Ok(products);
-
+            return Ok(directProducts);
         }
 
 

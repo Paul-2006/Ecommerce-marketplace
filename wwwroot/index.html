@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ecommerce Portal</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Marketplace Control</p>
+      <h1>Ecommerce Portal</h1>
+    </div>
+    <nav class="top-actions">
+      <a class="ghost-link" href="/swagger">Swagger</a>
+      <button id="logoutBtn" class="secondary hidden" type="button">Logout</button>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section id="authPanel" class="auth-grid">
+      <div class="intro-panel">
+        <h2>Run the store from one clean dashboard.</h2>
+        <p>Sign in by role, create users, reset passwords with OTP, and open the right portal for admin, seller, warehouse, delivery, or customer accounts.</p>
+        <div class="feature-row">
+          <span>Seller images</span>
+          <span>Live GPS</span>
+          <span>Stock details</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="login" type="button">Login</button>
+          <button class="tab" data-tab="register" type="button">Sign up</button>
+          <button class="tab" data-tab="forgot" type="button">Forgot</button>
+        </div>
+
+        <form id="loginForm" class="stack auth-tab" data-tab-panel="login">
+          <label>Email <input name="email" type="email" required autocomplete="email"></label>
+          <label>Password <input name="password" type="password" required autocomplete="current-password"></label>
+          <label>Portal
+            <select name="portal">
+              <option value="">Any role</option>
+              <option value="Admin">Admin</option>
+              <option value="Seller">Seller</option>
+              <option value="Warehouse">Warehouse</option>
+              <option value="Delivery">Delivery</option>
+              <option value="Customer">Customer</option>
+            </select>
+          </label>
+          <label class="checkline"><input name="rememberMe" type="checkbox"> Remember me</label>
+          <button class="primary" type="submit">Login</button>
+        </form>
+
+        <form id="registerForm" class="stack auth-tab hidden" data-tab-panel="register">
+          <label>Name <input name="username" required autocomplete="name"></label>
+          <label>Email <input name="email" type="email" required autocomplete="email"></label>
+          <label>Phone <input name="phoneNumber" autocomplete="tel"></label>
+          <label>Password <input name="password" type="password" required autocomplete="new-password" minlength="8"></label>
+          <p class="hint">Use 8+ characters and at least one special character.</p>
+          <label>Role
+            <select name="roleId" required>
+              <option value="5">Customer</option>
+              <option value="2">Seller</option>
+              <option value="3">Warehouse</option>
+              <option value="4">Delivery</option>
+            </select>
+          </label>
+          <button class="primary" type="submit">Create account</button>
+        </form>
+
+        <form id="forgotForm" class="stack auth-tab hidden" data-tab-panel="forgot">
+          <label>Email <input name="email" type="email" required autocomplete="email"></label>
+          <button class="primary" type="submit">Get OTP</button>
+        </form>
+
+        <form id="resetForm" class="stack auth-tab hidden" data-tab-panel="forgot">
+          <label>OTP <input name="otp" inputmode="numeric" required></label>
+          <label>New password <input name="newPassword" type="password" required minlength="8"></label>
+          <button class="secondary" type="submit">Reset password</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="dashboard-head">
+        <div>
+          <p class="eyebrow">Signed in</p>
+          <h2 id="welcomeTitle">Dashboard</h2>
+        </div>
+        <p id="tokenNote" class="muted"></p>
+      </div>
+
+      <div id="message" class="message hidden"></div>
+
+      <div class="grid">
+        <section class="panel">
+          <div class="section-head">
+            <h3>Profile</h3>
+            <button id="refreshProfileBtn" class="icon-btn" type="button" title="Refresh profile">Refresh</button>
+          </div>
+          <div id="profileCard" class="data-card">Login to see profile details.</div>
+          <form id="profileForm" class="stack compact">
+            <label>Name <input name="username"></label>
+            <label>Phone <input name="phoneNumber"></label>
+            <label>First name <input name="firstName"></label>
+            <label>Last name <input name="lastName"></label>
+            <label>Business name <input name="businessName"></label>
+            <label>Business address <input name="businessAddress"></label>
+            <label>GST number <input name="gstnumber"></label>
+            <label>Partner name <input name="partnerName"></label>
+            <label>Vehicle number <input name="vehicleNumber"></label>
+            <label>Warehouse name <input name="warehouseName"></label>
+            <label>Warehouse location <input name="warehouseLocation"></label>
+            <label>Warehouse contact <input name="warehouseContactNumber"></label>
+            <button class="primary" type="submit">Save profile</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <h3>Products</h3>
+            <button id="loadProductsBtn" class="icon-btn" type="button" title="Load products">Refresh</button>
+          </div>
+          <div id="productsList" class="list"></div>
+        </section>
+
+        <section id="sellerPanel" class="panel hidden">
+          <h3>Seller Images</h3>
+          <form id="imageForm" class="stack compact">
+            <label>Product ID <input name="productId" type="number" min="1" required></label>
+            <label>Image <input name="image" type="file" accept="image/*" required></label>
+            <label class="checkline"><input name="isPrimary" type="checkbox"> Primary image</label>
+            <button class="primary" type="submit">Upload image</button>
+          </form>
+          <div id="sellerProducts" class="list"></div>
+        </section>
+
+        <section id="adminPanel" class="panel hidden">
+          <div class="section-head">
+            <h3>Admin Summary</h3>
+            <button id="loadAdminBtn" class="icon-btn" type="button" title="Load admin summary">Refresh</button>
+          </div>
+          <div id="adminSummary" class="metrics"></div>
+        </section>
+
+        <section id="warehousePanel" class="panel hidden">
+          <div class="section-head">
+            <h3>Warehouse Stock</h3>
+            <button id="loadStockBtn" class="icon-btn" type="button" title="Load stock">Refresh</button>
+          </div>
+          <div id="stockList" class="list"></div>
+        </section>
+
+        <section id="deliveryPanel" class="panel hidden">
+          <h3>Delivery GPS</h3>
+          <form id="gpsForm" class="stack compact">
+            <label>Order ID <input name="orderId" type="number" min="1" required></label>
+            <button class="primary" type="submit">Show live GPS</button>
+          </form>
+          <div id="gpsCard" class="data-card">Enter an order ID to view delivery location.</div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

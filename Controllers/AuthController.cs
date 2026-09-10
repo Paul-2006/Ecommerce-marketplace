@@ -414,7 +414,7 @@ namespace Ecommerce.Controllers
             }
 
             string maskedEmail = MaskEmail(user.Email);
-            string maskedPhone = MaskPhone(user.PhoneNumber);
+            string maskedPhone = MaskPhone(user.PhoneNumber ?? "");
 
             return Ok(new
             {
@@ -466,7 +466,7 @@ namespace Ecommerce.Controllers
             }
 
             string method = (!string.IsNullOrWhiteSpace(dto.Channel) ? dto.Channel : dto.DeliveryMethod)?.Trim().ToLower() ?? "email";
-            string target = method == "sms" ? MaskPhone(user.PhoneNumber) : MaskEmail(user.Email);
+            string target = method == "sms" ? MaskPhone(user.PhoneNumber ?? "") : MaskEmail(user.Email);
 
             if (method == "sms" && !string.IsNullOrWhiteSpace(user.PhoneNumber))
             {

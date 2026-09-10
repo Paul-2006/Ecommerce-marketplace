@@ -1,4 +1,4 @@
-﻿using Ecommerce.Data;
+using Ecommerce.Data;
 using Ecommerce.DTOs;
 using Ecommerce.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -141,24 +141,25 @@ namespace Ecommerce.Controllers
         [HttpGet("Customer/{customerId}")]
         public async Task<IActionResult> GetCustomerCart(int customerId)
         {
-
             var cart = await _context.Carts
                 .FirstOrDefaultAsync(c => c.CustomerId == customerId);
 
-
-
             if (cart == null)
             {
-                return NotFound("Cart not found");
+                cart = new Cart
+                {
+                    CustomerId = customerId,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now
+                };
+                _context.Carts.Add(cart);
+                await _context.SaveChangesAsync();
             }
-
-
 
             return Ok(new
             {
                 cartId = cart.CartId
             });
-
         }
 
 

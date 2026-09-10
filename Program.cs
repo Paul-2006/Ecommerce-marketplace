@@ -44,11 +44,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
     if (!connected)
     {
-        options.UseInMemoryDatabase("EcommerceMarketplaceDb");
+        options.UseInMemoryDatabase("EcommerceMarketplaceDb")
+               .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning));
     }
 });
 
 // JWT Authentication
+var rawJwtKey = builder.Configuration["Jwt:Key"] ?? "ThisIsMySecretKeyForEcommerceApplication12345";
+if (rawJwtKey.Length < 32) rawJwtKey = rawJwtKey.PadRight(32, 'X');
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -62,11 +66,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-        )
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "EcommerceAPI",
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "EcommerceClient",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(rawJwtKey))
     };
 });
 
@@ -79,14 +81,28 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("CustomerOnly", policy => policy.RequireClaim("RoleId", "5"));
 });
 
-// CORS - Allow All Origins for Frontend (Local and Production/Vercel)
+// Dynamic CORS - Supports Configured Production Frontend Domains and Development Fallback
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        var origins = builder.Configuration.GetSection("AllowedOrigins:Origins").Get<string[]>()
+                      ?? builder.Configuration["FrontendUrl"]?.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+        if (origins != null && origins.Length > 0)
+        {
+            policy.WithOrigins(origins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        }
+        else
+        {
+            policy.SetIsOriginAllowed(_ => true)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        }
     });
 });
 
@@ -125,13 +141,13 @@ var app = builder.Build();
 // Middleware Pipeline
 app.UseCors("AllowReact");
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ecommerce API v1");
+    c.RoutePrefix = "swagger";
+});
 
-// Enable HTTPS Redirection only in non-development to avoid CORS 307 redirect issues on localhost:5151
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
@@ -140,6 +156,10 @@ if (!app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
+
+// Health Check Endpoints
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy", environment = app.Environment.EnvironmentName, timestamp = DateTime.UtcNow }));
+app.MapGet("/api/health", () => Results.Ok(new { status = "Healthy", environment = app.Environment.EnvironmentName, timestamp = DateTime.UtcNow }));
 
 app.MapControllers();
 
@@ -155,29 +175,9 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"[DB INIT] {ex.Message}");
     }
 
-    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-    var adminEmail = configuration["AdminSeed:Email"];
-    var adminPassword = configuration["AdminSeed:Password"];
-    var adminUsername = configuration["AdminSeed:Username"] ?? "Admin";
-
     try
     {
-        if (!string.IsNullOrWhiteSpace(adminEmail) &&
-            !string.IsNullOrWhiteSpace(adminPassword) &&
-            !context.Users.Any(u => u.RoleId == 1))
-        {
-            context.Users.Add(new User
-            {
-                Username = adminUsername,
-                Email = adminEmail,
-                PasswordHash = PasswordHasher.Hash(adminPassword),
-                RoleId = 1,
-                AccountStatus = "Active",
-                CreatedDate = DateTime.Now
-            });
-
-            context.SaveChanges();
-        }
+        DbSeeder.SeedAll(context);
     }
     catch (Exception ex)
     {
