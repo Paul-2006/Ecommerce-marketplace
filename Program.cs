@@ -1,6 +1,7 @@
 using Ecommerce.Data;
 using Ecommerce.Models;
 using Ecommerce.Services;
+using Ecommerce.Services.Verification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,6 +16,14 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddSingleton<IOtpService, OtpService>();
 builder.Services.AddSingleton<IUserLoginLogger, UserLoginLogger>();
+
+// Verification Services DI Registration
+builder.Services.AddScoped<IGstVerificationService, GstVerificationService>();
+builder.Services.AddScoped<IPanVerificationService, PanVerificationService>();
+builder.Services.AddScoped<IDrivingLicenceVerificationService, DrivingLicenceVerificationService>();
+builder.Services.AddScoped<IVehicleVerificationService, VehicleVerificationService>();
+builder.Services.AddScoped<IDocumentVerificationService, DocumentVerificationService>();
+builder.Services.AddScoped<IDigiLockerService, DigiLockerService>();
 
 builder.Services.AddControllers()
 .AddJsonOptions(options =>

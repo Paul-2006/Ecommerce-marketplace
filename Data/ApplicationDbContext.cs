@@ -109,6 +109,18 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Wishlistitem> Wishlistitems { get; set; }
 
+    public virtual DbSet<SellerVerification> SellerVerifications { get; set; }
+
+    public virtual DbSet<SellerVerificationCheck> SellerVerificationChecks { get; set; }
+
+    public virtual DbSet<DeliveryPartnerVerification> DeliveryPartnerVerifications { get; set; }
+
+    public virtual DbSet<DeliveryVerificationCheck> DeliveryVerificationChecks { get; set; }
+
+    public virtual DbSet<VerificationDocument> VerificationDocuments { get; set; }
+
+    public virtual DbSet<VerificationHistory> VerificationHistories { get; set; }
+
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -176,6 +188,13 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<Warehousenotification>(e => e.HasKey(x => x.NotificationId));
         modelBuilder.Entity<Wishlist>(e => e.HasKey(x => x.WishlistId));
         modelBuilder.Entity<Wishlistitem>(e => e.HasKey(x => x.WishlistItemId));
+
+        modelBuilder.Entity<SellerVerification>(e => e.HasKey(x => x.VerificationId));
+        modelBuilder.Entity<SellerVerificationCheck>(e => e.HasKey(x => x.CheckId));
+        modelBuilder.Entity<DeliveryPartnerVerification>(e => e.HasKey(x => x.VerificationId));
+        modelBuilder.Entity<DeliveryVerificationCheck>(e => e.HasKey(x => x.CheckId));
+        modelBuilder.Entity<VerificationDocument>(e => e.HasKey(x => x.DocumentId));
+        modelBuilder.Entity<VerificationHistory>(e => e.HasKey(x => x.HistoryId));
 
         // CART ITEM
 
