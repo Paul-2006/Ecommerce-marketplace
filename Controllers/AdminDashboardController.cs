@@ -1,4 +1,5 @@
 using Ecommerce.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,7 @@ namespace Ecommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "AdminOnly")]
     public class AdminDashboardController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -59,8 +61,7 @@ namespace Ecommerce.Controllers
         public async Task<IActionResult> GetRecentOrders()
         {
             var orders = await _context.Orders
-                .Include(o => o.Customer)
-                .ThenInclude(c => c.User)
+                .AsNoTracking()
                 .OrderByDescending(o => o.OrderDate)
                 .Take(10)
                 .Select(o => new

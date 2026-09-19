@@ -6,7 +6,7 @@ namespace Ecommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     public class AdminUserActivityController : ControllerBase
     {
         private readonly IUserLoginLogger _loginLogger;

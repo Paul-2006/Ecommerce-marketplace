@@ -22,46 +22,84 @@ namespace Ecommerce.Controllers
 
         // GET: api/Product
         [HttpGet]
-        public async Task<IActionResult> GetProducts()
+        public async Task<IActionResult> GetProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 0, [FromQuery] string? search = null, [FromQuery] string? category = null)
         {
-            var sellerProducts = await _context.Sellerproducts
-                .Include(sp => sp.Product)
-                .ThenInclude(p => p.Productimages)
-                .Select(sp => new
-                {
-                    sellerProductId = sp.SellerProductId,
-                    productId = sp.Product.ProductId,
-                    productName = sp.Product.ProductName,
-                    description = sp.Product.Description,
-                    brand = sp.Product.Brand,
-                    warranty = sp.Product.Warranty,
-                    price = sp.Price,
-                    stock = sp.StockQuantity,
-                    image = sp.Product.Productimages.Select(i => i.ImageUrl).FirstOrDefault()
-                })
-                .ToListAsync();
+            var query = _context.Sellerproducts
+                .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(category) && category != "All")
+            {
+                query = query.Where(sp => sp.Product.Category != null && sp.Product.Category.CategoryName.ToLower() == category.ToLower());
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.ToLower().Trim();
+                query = query.Where(sp => sp.Product.ProductName.ToLower().Contains(s) || 
+                                          (sp.Product.Brand != null && sp.Product.Brand.ToLower().Contains(s)));
+            }
+
+            var projected = query.Select(sp => new
+            {
+                sellerProductId = sp.SellerProductId,
+                productId = sp.Product.ProductId,
+                productName = sp.Product.ProductName,
+                description = sp.Product.Description,
+                brand = sp.Product.Brand,
+                warranty = sp.Product.Warranty,
+                category = sp.Product.Category != null ? sp.Product.Category.CategoryName : "General",
+                price = sp.Price,
+                stock = sp.StockQuantity,
+                image = sp.Product.Productimages.Select(i => i.ImageUrl).FirstOrDefault()
+            });
+
+            if (pageSize > 0)
+            {
+                var pagedItems = await projected.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+                return Ok(pagedItems);
+            }
+
+            var sellerProducts = await projected.ToListAsync();
 
             if (sellerProducts.Count > 0)
             {
                 return Ok(sellerProducts);
             }
 
-            var directProducts = await _context.Products
-                .Include(p => p.Productimages)
-                .Select(p => new
-                {
-                    sellerProductId = p.ProductId,
-                    productId = p.ProductId,
-                    productName = p.ProductName,
-                    description = p.Description,
-                    brand = p.Brand,
-                    warranty = p.Warranty,
-                    price = 9999m,
-                    stock = 10,
-                    image = p.Productimages.Select(i => i.ImageUrl).FirstOrDefault()
-                })
-                .ToListAsync();
+            var directProductsQuery = _context.Products.AsNoTracking();
 
+            if (!string.IsNullOrWhiteSpace(category) && category != "All")
+            {
+                directProductsQuery = directProductsQuery.Where(p => p.Category != null && p.Category.CategoryName.ToLower() == category.ToLower());
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.ToLower().Trim();
+                directProductsQuery = directProductsQuery.Where(p => p.ProductName.ToLower().Contains(s) || (p.Brand != null && p.Brand.ToLower().Contains(s)));
+            }
+
+            var directProjected = directProductsQuery.Select(p => new
+            {
+                sellerProductId = p.ProductId,
+                productId = p.ProductId,
+                productName = p.ProductName,
+                description = p.Description,
+                brand = p.Brand,
+                warranty = p.Warranty,
+                category = p.Category != null ? p.Category.CategoryName : "General",
+                price = 9999m,
+                stock = 10,
+                image = p.Productimages.Select(i => i.ImageUrl).FirstOrDefault()
+            });
+
+            if (pageSize > 0)
+            {
+                var pagedDirect = await directProjected.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+                return Ok(pagedDirect);
+            }
+
+            var directProducts = await directProjected.ToListAsync();
             return Ok(directProducts);
         }
 
@@ -74,16 +112,11 @@ namespace Ecommerce.Controllers
         // GET: api/Product/{id}
 
         [HttpGet("{id}")]
-
         public async Task<IActionResult> GetProduct(int id)
         {
-
-
             var product = await _context.Products
-
-            .Include(p => p.Productimages)
-
-            .Where(p => p.ProductId == id)
+                .AsNoTracking()
+                .Where(p => p.ProductId == id)
 
 
             .Select(p => new

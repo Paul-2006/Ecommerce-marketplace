@@ -1,16 +1,15 @@
-﻿using Ecommerce.Data;
+using Ecommerce.Data;
 using Ecommerce.DTOs;
 using Ecommerce.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Ecommerce.Controllers
 {
-
     [Route("api/[controller]")]
     [ApiController]
-
+    [Authorize(Policy = "SellerOnly")]
     public class SellerProductController : ControllerBase
     {
 
@@ -279,8 +278,24 @@ namespace Ecommerce.Controllers
 
         }
 
+        // PUT: api/SellerProduct/ToggleStatus/1
+        [HttpPut("ToggleStatus/{id}")]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            var sellerProduct = await _context.Sellerproducts.FindAsync(id);
+            if (sellerProduct == null)
+            {
+                return NotFound("Seller product not found");
+            }
 
+            sellerProduct.ProductStatus = sellerProduct.ProductStatus == "Active" ? "Inactive" : "Active";
+            await _context.SaveChangesAsync();
 
+            return Ok(new
+            {
+                message = $"Product status updated to {sellerProduct.ProductStatus}",
+                status = sellerProduct.ProductStatus
+            });
+        }
     }
-
 }

@@ -1,6 +1,7 @@
 using Ecommerce.Data;
 using Ecommerce.DTOs;
 using Ecommerce.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ namespace Ecommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "AdminOnly")]
     public class AdminProductController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
